@@ -1,7 +1,13 @@
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
-        System.out.println ("Введите первое число:");
+        boolean bool=false;
+        while (bool!=true) {
+            String path = new Scanner(System.in).nextLine();
+        }
+
+
+        /*System.out.println ("Введите первое число:");
         int firstNumber = new Scanner(System.in).nextInt();
                 System.out.println ("Введите второе число:");
         int secondNumber = new Scanner(System.in).nextInt();
@@ -10,5 +16,9 @@ public class Main {
         System.out.println ("Сумма чисел:"+(firstNumber+secondNumber));
         System.out.println ("Произведение чисел:"+(firstNumber*secondNumber));
         System.out.println ("Частное чисел:"+quotient);
+
+         */
+
+
     }
 }
