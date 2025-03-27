@@ -39,7 +39,7 @@ public class Main {
                         throw new LineTooLongException("Строка длинной более 1024 символа"); //выбрасывание исключения при превышении 1024
                     }
                     if (length > maxLength) maxLength = length; //подсчет максимальной строки
-                    if (length > minLength) minLength = length;//подсчет минимальной строки
+                    if (length < minLength) minLength = length;//подсчет минимальной строки
                 }
                 //вывод сообщений
                 System.out.println("Общее количество строк" + totalLines);
