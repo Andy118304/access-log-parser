@@ -18,7 +18,7 @@ public class Main {
             boolean fileExist = file.exists(); //переменная будет равна true, если файл существует и false, если не существует
             boolean isDirectory = file.isDirectory();
 
-            if (fileExist == false /*|| isDirectory == false*/) {
+            if (fileExist == false || isDirectory == false) {
                 System.out.println("Указанный файл не существует или указанный путь является путём к папке, а не файлу");
                 // Проверка по переменным System.out.println(fileExist + " " + isDirectory);
                 continue; //пропускаем оставшуюся часть цикла
