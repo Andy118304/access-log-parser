@@ -18,18 +18,21 @@ public class Main {
             boolean fileExist = file.exists(); //переменная будет равна true, если файл существует и false, если не существует
             boolean isDirectory = file.isDirectory();
 
-            if (fileExist == false || isDirectory == false) {
+            if (path.equalsIgnoreCase("exit")) {
+                System.out.println("Вы вышли из алгоритма");
+                break;
+            } else if (!fileExist || isDirectory) {
+
                 System.out.println("Указанный файл не существует или указанный путь является путём к папке, а не файлу");
                 // Проверка по переменным System.out.println(fileExist + " " + isDirectory);
                 continue; //пропускаем оставшуюся часть цикла
-            } else if (fileExist == true && isDirectory == true) {
+            } else if (fileExist) {
                 count++;
                 System.out.println("Путь указан верно.Это файл номер" + count);
             }
 
+
             int totalLines = 0;  //переменная - количество строк в файле
-            int maxLength = Integer.MAX_VALUE; // переменная - длина самой длинной строки в файле
-            int minLength = Integer.MIN_VALUE;// переменная - длина самой короткой строки в файле
             //исключение, условие в задании
             try {
                 //код, который будет построчно читать указанный файл
@@ -42,35 +45,32 @@ public class Main {
                     if (length > 1024) {
                         throw new LineTooLongException("Строка длинной более 1024 символа"); //выбрасывание исключения при превышении 1024
                     }
-                    if (length > maxLength) maxLength = length; //подсчет максимальной строки
-                    if (length < minLength) minLength = length;//подсчет минимальной строки
 
-                    String[] splitLine = line.split(" ");
-                    if (splitLine.length >= 11) {
-                        String userAgent = extractUserAgent(splitLine[11]);
-                        if (userAgent != null) {
-                            if (userAgent.contains("Googlebot")) {
-                                googleBot++;
-                            }
-                            if (userAgent.contains("YandexBot")) {
-                                yandexBot++;
-                            }
+                    String[] splitLine = line.split("\"");
+                    String userAgent = splitLine[splitLine.length - 1];
+                    String botName = extractBotString(userAgent);
+                    if (botName != null) {
+                        if (botName.equals((" Googlebot"))) {
+                            googleBot++;
+                        }
+                        if (botName.equals(" YandexBot")) {
+                            yandexBot++;
                         }
                     }
                     // проверка System.out.println(Arrays.stream(splitLine).toList());
 
                 }
                 //вывод сообщений
-                System.out.println("Общее количество строк" + totalLines);
-                //System.out.println("Самая длинная строка" + maxLength);
-                System.out.println("Доля запросов YandexBot:" + yandexBot / totalLines);
-                System.out.println("Доля запросов GoogleBot:" + googleBot / totalLines);
-                //System.out.println("Самая короткая строка" + minLength);
+                System.out.println("Общее количество строк: " + totalLines);
+                System.out.println("Количество YandexBot: " + yandexBot);
+                System.out.println("Количество GoogleBot: " + googleBot);
+                System.out.println("Доля запросов YandexBot в %: " + (double) yandexBot * 100 / totalLines);
+                System.out.println("Доля запросов GoogleBot в %: " + (double) googleBot * 100 / totalLines);
             } catch (LineTooLongException e) {
                 System.out.println("Ошибка программы. Слишком длинная строка в файле");
                 break;
             } catch (Exception ex) {
-                System.out.println("Другие ошибки программы.Обратитесь к разработчику при этой ошибке" + ex);
+                ex.printStackTrace();
             }
         }
 
@@ -78,6 +78,20 @@ public class Main {
 
     //метод для извлечения части в первых скобках и выделения нужного фрагмента
     String userAgentString = "";
+
+    private static String extractBotString(String userAgentString) {
+        String[] splitline = userAgentString.split("\"");
+        String userAgent = splitline[splitline.length - 1];
+        System.out.println(userAgent);
+
+        String[] components = userAgent.split(";");
+        if (components.length >= 2) {
+            String[] fragments = components[1].split("/");
+            System.out.println(fragments[0].replaceAll("", ""));
+            return fragments[0].replaceAll("", "");
+        }
+        return null;
+    }
 
     private static String extractUserAgent(String userAgentString) {
         int firstB = userAgentString.indexOf("(");
