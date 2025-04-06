@@ -10,6 +10,7 @@ public class Main {
         int count = 0;//счетчик верных файлов
         int googleBot = 0; //счетчик гуглбота
         int yandexBot = 0; //счетчик яндексбота
+        Statistics stats = new Statistics(); // создаем экземплер класса статистики
         while (true) {
             System.out.println("Путь файла:");
             String path = new Scanner(System.in).nextLine();//сканер с ввода и объявление переменной path
@@ -45,15 +46,18 @@ public class Main {
                     if (length > 1024) {
                         throw new LineTooLongException("Строка длинной более 1024 символа"); //выбрасывание исключения при превышении 1024
                     }
-
+                    LogEntry lEntry = new LogEntry(line); // берём строку из файла, создаем объект для разбора
+                    stats.addEntry(lEntry); //обработка статистики по строке
+                    UserAgent uAgent =new UserAgent(lEntry.getUserAgent());//берём параметр из экземпляра LogEntry для работы по UserAgent
+                    //Обработка ботов
                     String[] splitLine = line.split("\"");
                     String userAgent = splitLine[splitLine.length - 1];
                     String botName = extractBotString(userAgent);
                     if (botName != null) {
-                        if (botName.equals((" Googlebot"))) {
+                        if (botName.equals(("Googlebot"))) {
                             googleBot++;
                         }
-                        if (botName.equals(" YandexBot")) {
+                        if (botName.equals("YandexBot")) {
                             yandexBot++;
                         }
                     }
@@ -66,6 +70,7 @@ public class Main {
                 System.out.println("Количество GoogleBot: " + googleBot);
                 System.out.println("Доля запросов YandexBot в %: " + (double) yandexBot * 100 / totalLines);
                 System.out.println("Доля запросов GoogleBot в %: " + (double) googleBot * 100 / totalLines);
+                System.out.println("Средний траффик в час: "+stats.getTrafficRate());
             } catch (LineTooLongException e) {
                 System.out.println("Ошибка программы. Слишком длинная строка в файле");
                 break;
@@ -82,18 +87,18 @@ public class Main {
     private static String extractBotString(String userAgentString) {
         String[] splitline = userAgentString.split("\"");
         String userAgent = splitline[splitline.length - 1];
-        System.out.println(userAgent);
+        //System.out.println(userAgent);
 
         String[] components = userAgent.split(";");
         if (components.length >= 2) {
             String[] fragments = components[1].split("/");
-            System.out.println(fragments[0].replaceAll("", ""));
-            return fragments[0].replaceAll("", "");
+            //System.out.println(fragments[0].replaceAll("", ""));
+            return fragments[0].replaceAll(" ", "");
         }
         return null;
     }
 
-    private static String extractUserAgent(String userAgentString) {
+private static String extractUserAgent(String userAgentString) {
         int firstB = userAgentString.indexOf("(");
         int lastB = userAgentString.lastIndexOf(")");
         String firstBrackets = userAgentString.substring(firstB + 1, lastB);
@@ -104,6 +109,8 @@ public class Main {
             return firstBrackets;
         }
         return null;
+
+
     }
 }
 /*Напишите код, который будет разделять каждую строку на составляющие.
