@@ -72,7 +72,9 @@ public class Main {
                 System.out.println("Доля запросов GoogleBot в %: " + (double) googleBot * 100 / totalLines);
                 System.out.println("Средний траффик в час: "+stats.getTrafficRate());
                 System.out.println("Список страниц сайта: "+stats.getValidPages());
+                System.out.println("Список несуществующих страниц сайта: "+stats.getUnValidPages());
                 System.out.println("Статистика ОС,доля от целого: "+ stats.getOsStats());
+                System.out.println("Статистика браузеров,доля от целого: "+ stats.getbrowserStats());
             } catch (LineTooLongException e) {
                 System.out.println("Ошибка программы. Слишком длинная строка в файле");
                 break;

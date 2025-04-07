@@ -10,6 +10,8 @@ public class Statistics {
     LocalDateTime maxTime;
     private final HashSet<String> validPages = new HashSet<>();
     private final HashMap<String, Integer> osCounter = new HashMap<>();
+    private final HashSet<String> unValidPages = new HashSet();
+    private final HashMap<String, Integer> browserCounter = new HashMap<>();
 
     public Statistics() {
         int totalTraffic = 0;
@@ -38,6 +40,14 @@ public class Statistics {
         UserAgent userAgent = new UserAgent(logEntry.userAgent);
         String os = userAgent.getTypeOS();
         osCounter.put(os,osCounter.getOrDefault(os,0)+1);
+
+        //добавление URL страниц с кодом 404
+        if (logEntry.getCodeResponse() == 404) {
+            unValidPages.add(logEntry.getPathRequest());
+        }
+        //подсчет браузеров из user agent
+        String browser = userAgent.getTypeBrowser();
+        browserCounter.put(browser,browserCounter.getOrDefault(os,0)+1);
     }
 
     public double getTrafficRate() {
@@ -48,6 +58,10 @@ public class Statistics {
 
     public HashSet<String> getValidPages() {
         return validPages;
+    }
+
+    public HashSet<String> getUnValidPages() {
+        return unValidPages;
     }
 
     public int getTotalTraffic() {
@@ -71,5 +85,16 @@ public class Statistics {
         }
         return result;
     }
+    public HashMap<String,Double> getbrowserStats(){
+        HashMap<String,Double>resultBrowser = new HashMap<>();
+        int total = browserCounter.values().stream().mapToInt(Integer::intValue).sum();
+
+        for (Map.Entry<String,Integer>entry: browserCounter.entrySet()){
+            resultBrowser.put(entry.getKey(),(double) entry.getValue()/total);
+        }
+        return resultBrowser;
+    }
 
 }
+
+
