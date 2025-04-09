@@ -49,7 +49,7 @@ public class Main {
                     LogEntry lEntry = new LogEntry(line); // берём строку из файла, создаем объект для разбора
                     stats.addEntry(lEntry); //обработка статистики по строке
                     UserAgent uAgent =new UserAgent(lEntry.getUserAgent());//берём параметр из экземпляра LogEntry для работы по UserAgent
-                    //Обработка ботов
+                    //Обработка гуглоботов и яндексботов
                     String[] splitLine = line.split("\"");
                     String userAgent = splitLine[splitLine.length - 1];
                     String botName = extractBotString(userAgent);
@@ -75,6 +75,9 @@ public class Main {
                 System.out.println("Список несуществующих страниц сайта: "+stats.getUnValidPages());
                 System.out.println("Статистика ОС,доля от целого: "+ stats.getOsStats());
                 System.out.println("Статистика браузеров,доля от целого: "+ stats.getbrowserStats());
+                System.out.println("Статистика среднего количества ошибочных запросов в час: "+ stats.getAverageErrorsPerHour());
+                System.out.println("Статистика среднего количества посещений за час: "+ stats.getAverageVisitorsPerHour());
+                System.out.println("Статистика средней посещаемости одним пользователем сайта: "+ stats.getAverageVisitorsPerUser());
             } catch (LineTooLongException e) {
                 System.out.println("Ошибка программы. Слишком длинная строка в файле");
                 break;

@@ -8,10 +8,13 @@ public class Statistics {
     int totalTraffic; //суммарный объем траффика
     LocalDateTime minTime;
     LocalDateTime maxTime;
-    private final HashSet<String> validPages = new HashSet<>();
-    private final HashMap<String, Integer> osCounter = new HashMap<>();
-    private final HashSet<String> unValidPages = new HashSet();
-    private final HashMap<String, Integer> browserCounter = new HashMap<>();
+    private final HashSet<String> validPages = new HashSet<>();//спиосок валидных страниц
+    private final HashMap<String, Integer> osCounter = new HashMap<>();//HashMap для операционных систем
+    private final HashSet<String> unValidPages = new HashSet();//список некорректных страниц
+    private final HashMap<String, Integer> browserCounter = new HashMap<>(); //HashMao для браузеров
+    int errorRequestCount; //переменная для подсчета заходов по некорректному пути
+    int notBotVisitCount;//переменная для расчета не ботов
+    private HashSet<String> uniqueRealUsers = new HashSet<>();//IP адреса обычных пользователей
 
     public Statistics() {
         int totalTraffic = 0;
@@ -35,11 +38,13 @@ public class Statistics {
         //добавление URL страниц с кодом 200
         if (logEntry.getCodeResponse() == 200) {
             validPages.add(logEntry.getPathRequest());
+        } else if (logEntry.getCodeResponse() >= 400 && logEntry.getCodeResponse() < 600) {
+            errorRequestCount++;
         }
         //подсчет ОС из user agent
         UserAgent userAgent = new UserAgent(logEntry.userAgent);
         String os = userAgent.getTypeOS();
-        osCounter.put(os,osCounter.getOrDefault(os,0)+1);
+        osCounter.put(os, osCounter.getOrDefault(os, 0) + 1);
 
         //добавление URL страниц с кодом 404
         if (logEntry.getCodeResponse() == 404) {
@@ -47,7 +52,29 @@ public class Statistics {
         }
         //подсчет браузеров из user agent
         String browser = userAgent.getTypeBrowser();
-        browserCounter.put(browser,browserCounter.getOrDefault(os,0)+1);
+        browserCounter.put(browser, browserCounter.getOrDefault(os, 0) + 1);
+
+        if (!userAgent.isBot(logEntry.userAgent)){
+            notBotVisitCount++;
+            uniqueRealUsers.add(logEntry.getIp());
+        }
+    }
+
+    //метод расчета среднего количества посетителей за час
+    public Double getAverageVisitorsPerHour() {
+        int hours = (int) Duration.between(maxTime, minTime).toHours();
+        return (double) notBotVisitCount / hours;
+    }
+
+    //метод расчета среднего количества ошибок за час
+    public Double getAverageErrorsPerHour() {
+        int hours = (int) Duration.between(maxTime, minTime).toHours();
+        return (double)errorRequestCount / hours;
+    }
+
+    //метод расчета среднего количества посещений от юзера
+    public Double getAverageVisitorsPerUser() {
+        return (double) notBotVisitCount / uniqueRealUsers.size();
     }
 
     public double getTrafficRate() {
@@ -76,21 +103,23 @@ public class Statistics {
         return maxTime;
     }
 
-    public HashMap<String,Double> getOsStats(){
-        HashMap<String,Double>result = new HashMap<>();
+    public HashMap<String, Double> getOsStats() {
+        HashMap<String, Double> result = new HashMap<>();
         int total = osCounter.values().stream().mapToInt(Integer::intValue).sum();
 
-        for (Map.Entry<String,Integer>entry: osCounter.entrySet()){
-            result.put(entry.getKey(),(double) entry.getValue()/total);
+        for (Map.Entry<String, Integer> entry : osCounter.entrySet()) {
+            result.put(entry.getKey(), (double) entry.getValue() / total);
         }
+
         return result;
     }
-    public HashMap<String,Double> getbrowserStats(){
-        HashMap<String,Double>resultBrowser = new HashMap<>();
+
+    public HashMap<String, Double> getbrowserStats() {
+        HashMap<String, Double> resultBrowser = new HashMap<>();
         int total = browserCounter.values().stream().mapToInt(Integer::intValue).sum();
 
-        for (Map.Entry<String,Integer>entry: browserCounter.entrySet()){
-            resultBrowser.put(entry.getKey(),(double) entry.getValue()/total);
+        for (Map.Entry<String, Integer> entry : browserCounter.entrySet()) {
+            resultBrowser.put(entry.getKey(), (double) entry.getValue() / total);
         }
         return resultBrowser;
     }

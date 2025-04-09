@@ -1,6 +1,7 @@
 public class UserAgent {
     private final String typeOS;//тип операционной системы
     private final String typeBrowser;//тип браузера
+    private boolean isBot;//бот ли делает запрос
 
     public UserAgent(String userAgentString) {
         //определение типа ОС
@@ -26,6 +27,12 @@ public class UserAgent {
             this.typeBrowser = "Другой";
         }
 
+    }
+    public boolean isBot(String userAgentString){
+        if (userAgentString.contains("bot")||userAgentString.contains("Bot")){
+            this.isBot= true;
+        }
+        return isBot;
     }
 
     public String getTypeOS() {
