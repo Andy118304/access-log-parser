@@ -11,10 +11,12 @@ public class Statistics {
     private final HashSet<String> validPages = new HashSet<>();//спиосок валидных страниц
     private final HashMap<String, Integer> osCounter = new HashMap<>();//HashMap для операционных систем
     private final HashSet<String> unValidPages = new HashSet();//список некорректных страниц
-    private final HashMap<String, Integer> browserCounter = new HashMap<>(); //HashMao для браузеров
+    private final HashMap<String, Integer> browserCounter = new HashMap<>(); //HashMap для браузеров
     int errorRequestCount; //переменная для подсчета заходов по некорректному пути
     int notBotVisitCount;//переменная для расчета не ботов
     private HashSet<String> uniqueRealUsers = new HashSet<>();//IP адреса обычных пользователей
+      HashMap<Integer,Integer> usersPerSeconds= new HashMap<>();//HashMap посещения пользователей сайта по секундам
+
 
     public Statistics() {
         int totalTraffic = 0;
@@ -62,13 +64,13 @@ public class Statistics {
 
     //метод расчета среднего количества посетителей за час
     public Double getAverageVisitorsPerHour() {
-        int hours = (int) Duration.between(maxTime, minTime).toHours();
+        int hours = (int) Duration.between(minTime,maxTime).toHours();
         return (double) notBotVisitCount / hours;
     }
 
     //метод расчета среднего количества ошибок за час
     public Double getAverageErrorsPerHour() {
-        int hours = (int) Duration.between(maxTime, minTime).toHours();
+        int hours = (int) Duration.between(minTime,maxTime).toHours();
         return (double)errorRequestCount / hours;
     }
 
@@ -114,6 +116,8 @@ public class Statistics {
         return result;
     }
 
+
+
     public HashMap<String, Double> getbrowserStats() {
         HashMap<String, Double> resultBrowser = new HashMap<>();
         int total = browserCounter.values().stream().mapToInt(Integer::intValue).sum();
@@ -125,5 +129,3 @@ public class Statistics {
     }
 
 }
-
-
