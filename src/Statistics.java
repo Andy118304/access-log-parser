@@ -15,11 +15,12 @@ public class Statistics {
     int errorRequestCount; //переменная для подсчета заходов по некорректному пути
     int notBotVisitCount;//переменная для расчета не ботов
     private HashSet<String> uniqueRealUsers = new HashSet<>();//IP адреса обычных пользователей
-      HashMap<Integer,Integer> usersPerSeconds= new HashMap<>();//HashMap посещения пользователей сайта по секундам
-
+    private HashMap<Integer, Integer> usersPerSeconds = new HashMap<>();//HashMap посещения пользователей сайта по секундам
+    private HashSet<String> refererDomains = new HashSet<>();
+    private HashMap<String, Integer> userVisitCount = new HashMap<>();
 
     public Statistics() {
-        int totalTraffic = 0;
+        this.totalTraffic = 0;
         this.minTime = LocalDateTime.MAX;
         this.maxTime = LocalDateTime.MIN;
     }
@@ -56,22 +57,50 @@ public class Statistics {
         String browser = userAgent.getTypeBrowser();
         browserCounter.put(browser, browserCounter.getOrDefault(os, 0) + 1);
 
-        if (!userAgent.isBot(logEntry.userAgent)){
+        //счетчики и сущности привязанные к боту
+        if (!userAgent.isBot(logEntry.userAgent)) {
             notBotVisitCount++;
-            uniqueRealUsers.add(logEntry.getIp());
+            String ip = logEntry.getIp();
+            uniqueRealUsers.add(ip);
+            userVisitCount.put(ip, userVisitCount.getOrDefault(ip, 0) + 1);
+            int secondKey = entryTime.toLocalTime().toSecondOfDay();
+            usersPerSeconds.put(secondKey, usersPerSeconds.getOrDefault(secondKey, 0) + 1);
         }
+
+        String referer = logEntry.getReferer();
+        if (referer.startsWith("http")) {
+            try {
+                String domain = referer.split("/")[2];
+                refererDomains.add(domain);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+    //метод возвращает пиковую посещаемость
+    public int getPeakVisitorsPerSecond(){
+        return  usersPerSeconds.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+    }
+
+    //метод возвращает список сайтов, на которых есть ссылки на текущий сайт
+    public HashSet<String> getRefererDomains(){
+        return refererDomains;
+    }
+
+    //метод возваращает расчет посещаемости одним пользователем
+    public int getMaxVisitsByOneUser(){
+        return userVisitCount.values().stream().mapToInt(Integer::intValue).max().orElse(0);
     }
 
     //метод расчета среднего количества посетителей за час
     public Double getAverageVisitorsPerHour() {
-        int hours = (int) Duration.between(minTime,maxTime).toHours();
+        int hours = (int) Duration.between(minTime, maxTime).toHours();
         return (double) notBotVisitCount / hours;
     }
 
     //метод расчета среднего количества ошибок за час
     public Double getAverageErrorsPerHour() {
-        int hours = (int) Duration.between(minTime,maxTime).toHours();
-        return (double)errorRequestCount / hours;
+        int hours = (int) Duration.between(minTime, maxTime).toHours();
+        return (double) errorRequestCount / hours;
     }
 
     //метод расчета среднего количества посещений от юзера
@@ -115,7 +144,6 @@ public class Statistics {
 
         return result;
     }
-
 
 
     public HashMap<String, Double> getbrowserStats() {

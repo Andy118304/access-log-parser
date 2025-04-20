@@ -42,4 +42,6 @@ public class UserAgent {
     public String getTypeBrowser() {
         return typeBrowser;
     }
+
+
 }

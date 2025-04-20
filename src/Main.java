@@ -78,6 +78,9 @@ public class Main {
                 System.out.println("Статистика среднего количества ошибочных запросов в час: "+ stats.getAverageErrorsPerHour());
                 System.out.println("Статистика среднего количества посещений за час: "+ stats.getAverageVisitorsPerHour());
                 System.out.println("Статистика средней посещаемости одним пользователем сайта: "+ stats.getAverageVisitorsPerUser());
+                System.out.println("Пиковая посещаемость в секунду: "+ stats.getPeakVisitorsPerSecond());
+                System.out.println("Максимальное количество посещений одним пользователем: "+ stats.getMaxVisitsByOneUser());
+                System.out.println("Список внешних доменов, ссылающихся на сайт: "+ stats.getRefererDomains());
             } catch (LineTooLongException e) {
                 System.out.println("Ошибка программы. Слишком длинная строка в файле");
                 break;
