@@ -25,6 +25,7 @@ public class Statistics {
         this.maxTime = LocalDateTime.MIN;
     }
 
+
     public void addEntry(LogEntry logEntry) {
         totalTraffic += logEntry.getSizeDate();
 
@@ -68,13 +69,15 @@ public class Statistics {
         }
 
         String referer = logEntry.getReferer();
-        if (referer.startsWith("http")) {
+
+
+
             try {
+
                 String domain = referer.split("/")[2];
                 refererDomains.add(domain);
             } catch (Exception ignored) {
             }
-        }
     }
     //метод возвращает пиковую посещаемость
     public int getPeakVisitorsPerSecond(){
